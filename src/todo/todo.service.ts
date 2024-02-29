@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto/create-todo.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TodoEntity, TodoStatus } from 'src/Entities/Todo.entity';
+import { TodoEntity } from 'src/Entities/Todo.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/Entities/user.entity';
 import { UpdateTodoDto } from './dto/update-todo.dto/update-todo.dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class TodoService {
@@ -14,20 +15,20 @@ export class TodoService {
     @InjectRepository(UserEntity)
     private userentity: Repository<UserEntity>,
   ) {}
+  private readonly userservice: UserService;
   //create
-  async create(createTodoDTO: CreateTodoDto, user: UserEntity) {
-    const todo = new TodoEntity();
-    const { title, content } = createTodoDTO;
-    todo.title = title;
-    todo.content = content;
-    todo.status = TodoStatus.OPEN;
-    const foundUser = await this.userentity.findOne({
-      where: { id: createTodoDTO.user },
+  async create(createTodoDto: CreateTodoDto, userId: number) {
+    let todo: TodoEntity = new TodoEntity();
+    todo.title = createTodoDto.title;
+    todo.content = createTodoDto.content;
+    todo.todostatus;
+
+    console.log('userId', userId);
+    todo.user = await this.userentity.findOne({
+      where: { id: userId },
     });
-    console.log('foundUser', foundUser);
-    todo.user = foundUser;
-    await this.todoRepository.save(todo);
-    return todo;
+
+    return this.todoRepository.save(todo);
   }
 
   async getalltodos(user: UserEntity) {
@@ -53,7 +54,7 @@ export class TodoService {
     const partialTodo: Partial<TodoEntity> = {
       title: updateTodoDto.title,
       content: updateTodoDto.content,
-      status: updateTodoDto.status,
+      todostatus: true,
     };
 
     const todo = await this.todoRepository.update(id, partialTodo);
@@ -68,5 +69,20 @@ export class TodoService {
     }
     await this.todoRepository.remove(todo);
     return todo;
+  }
+
+  findAllTodoByUserNotCompleted(userId: number) {
+    return this.todoRepository.find({
+      relations: ['user'],
+      where: { user: { id: userId }, todostatus: false },
+    });
+  }
+
+  findAllTodoByUserCompleted(userId: number) {
+    // userid not completed
+    return this.todoRepository.find({
+      relations: ['user'],
+      where: { user: { id: userId }, todostatus: true },
+    });
   }
 }

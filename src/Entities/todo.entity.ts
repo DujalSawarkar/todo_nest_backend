@@ -12,16 +12,9 @@ export class TodoEntity {
   @Column()
   content: string;
 
-  @Column({ default: 'OPEN' })
-  status: TodoStatus;
+  @Column({ default: false })
+  todostatus: boolean;
 
   @ManyToOne(() => UserEntity, (user) => user.todos)
   user: UserEntity;
-
-}
-
-export enum TodoStatus {
-  OPEN = 'OPEN',
-
-  completed = 'completed',
 }

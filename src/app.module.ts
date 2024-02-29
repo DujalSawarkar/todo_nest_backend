@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
+import { AdminController } from './admin/admin.controller';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     UserEntity,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AdminController],
   providers: [AppService],
 })
 export class AppModule {}

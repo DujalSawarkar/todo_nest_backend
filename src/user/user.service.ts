@@ -30,4 +30,9 @@ export class UserService {
     console.log('user', user);
     return user;
   }
+  async findUserById(id: number) {
+    let user = await this.userRepository.findOne({ where: { id: id } });
+    console.log('user', user);
+    return user;
+  }
 }

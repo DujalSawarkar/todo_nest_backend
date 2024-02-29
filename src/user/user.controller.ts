@@ -19,9 +19,12 @@ import { UpdateTodoDto } from 'src/todo/dto/update-todo.dto/update-todo.dto';
 @UseGuards(AuthGuard('jwt'), new RoleGuard('user'))
 export class UserController {
   constructor(private readonly todosevice: TodoService) {}
-  @Post()
-  async createtodo(@Body() CreateTodoDto: CreateTodoDto, user: UserEntity) {
-    const todo = await this.todosevice.create(CreateTodoDto, user);
+  @Post(':id')
+  async createtodo(
+    @Body() CreateTodoDto: CreateTodoDto,
+    @Param('id') id: number,
+  ) {
+    const todo = await this.todosevice.create(CreateTodoDto, id);
 
     return todo;
   }
@@ -56,5 +59,15 @@ export class UserController {
     const todo = await this.todosevice.deletetodo(id);
     console.log('usercontrollerdeletetodo', todo);
     return { message: 'Todo deleted', todo };
+  }
+
+  @Get('/notcompleted/:userId')
+  findAllTodosByUserIdNotCompleted(@Param('userId') userId: number) {
+    return this.todosevice.findAllTodoByUserNotCompleted(userId);
+  }
+
+  @Get('/completed/:userId')
+  findAllTodosByUserIdCompleted(@Param('userId') userId: number) {
+    return this.todosevice.findAllTodoByUserCompleted(userId);
   }
 }
