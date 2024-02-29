@@ -54,10 +54,10 @@ export class TodoService {
     const partialTodo: Partial<TodoEntity> = {
       title: updateTodoDto.title,
       content: updateTodoDto.content,
-      todostatus: true,
     };
 
     const todo = await this.todoRepository.update(id, partialTodo);
+    await this.todoRepository.update(id, { todostatus: true });
 
     return todo;
   }
