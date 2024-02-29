@@ -26,6 +26,7 @@ export class UserService {
     user.email = CreateUserDto.email;
     user.name = CreateUserDto.name;
     user.password = await bcrypt.hash(CreateUserDto.password, saltRounds);
+    user.role = CreateUserDto.role;
     user = await this.userRepository.save(user);
     console.log('user', user);
     return user;
@@ -33,6 +34,21 @@ export class UserService {
   async findUserById(id: number) {
     let user = await this.userRepository.findOne({ where: { id: id } });
     console.log('user', user);
+    return user;
+  }
+
+  async getallusers() {
+    const users = await this.userRepository.find();
+    console.log('users', users);
+    return users;
+  }
+
+  async deleteuser(id: number) {
+    const user = await this.userRepository.findOne({ where: { id: id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepository.delete({ id: id });
     return user;
   }
 }

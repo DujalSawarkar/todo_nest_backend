@@ -42,11 +42,14 @@ export class UserController {
     return todos;
   }
 
-  @Get('/:id')
-  async gettodosbyuser(@Param() id: number) {
-    const todos = await this.todo.gettodosbyuser(id);
-    console.log('usercontrollergettodosbyuser', todos);
-    return todos;
+  @Get('/todo')
+  async gettodosbyuser(@Req() req: Request) {
+    let token = (
+      req.headers as { authorization?: string }
+    )?.authorization?.replace('Bearer ', '');
+
+    const userId = (req.user as UserEntity).id;
+    return await this.todo.gettodosbyuser(userId);
   }
 
   @Put('/:id')
@@ -66,13 +69,19 @@ export class UserController {
     return { message: 'Todo deleted', todo };
   }
 
-  @Get('/notcompleted/:userId')
-  findAllTodosByUserIdNotCompleted(@Param('userId') userId: number) {
+  @Get('/notcompleted')
+  findAllTodosByUserIdNotCompleted(@Req() req: Request) {
+    let token = (
+      req.headers as { authorization?: string }
+    )?.authorization?.replace('Bearer ', '');
+
+    const userId = (req.user as UserEntity).id;
     return this.todo.findAllTodoByUserNotCompleted(userId);
   }
 
-  @Get('/completed/:userId')
-  findAllTodosByUserIdCompleted(@Param('userId') userId: number) {
+  @Get('/completed')
+  findAllTodosByUserIdCompleted(@Req() req: Request) {
+    const userId = (req.user as UserEntity).id;
     return this.todo.findAllTodoByUserCompleted(userId);
   }
 }
