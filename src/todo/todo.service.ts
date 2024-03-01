@@ -17,10 +17,11 @@ export class TodoService {
   ) {}
   private readonly userservice: UserService;
   //create
-  async create(createTodoDto: CreateTodoDto, userId: number) {
+  async create(createTodoDto: any, userId: number) {
     let todo: TodoEntity = new TodoEntity();
-    todo.title = createTodoDto.title;
-    todo.content = createTodoDto.content;
+
+    todo.title = createTodoDto.body.title;
+    todo.content = createTodoDto.body.content;
     todo.todostatus;
 
     console.log('userId', userId);
@@ -47,7 +48,10 @@ export class TodoService {
     let user = await this.userentity.findOne({
       where: { id: userid },
     });
-    return this.todoRepository.find({ where: { user: user } });
+
+    console.log('Todo User', user);
+    console.log(await this.todoRepository.find({ where: { user: user } }));
+    return await this.todoRepository.find({ where: { user: user } });
   }
 
   async updatetodo(id: number, updateTodoDto: UpdateTodoDto) {
@@ -67,6 +71,7 @@ export class TodoService {
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
+    console.log(todo);
     await this.todoRepository.remove(todo);
     return todo;
   }
@@ -84,5 +89,16 @@ export class TodoService {
       relations: ['user'],
       where: { user: { id: userId }, todostatus: true },
     });
+  }
+
+  async deletetodosbyuser(userId: number) {
+    const todos = await this.todoRepository.findOne({
+      relations: ['user'],
+      where: { user: { id: userId } },
+    });
+
+    if (!todos) return;
+    console.log('todos by user:', todos);
+    return await this.todoRepository.remove(todos);
   }
 }

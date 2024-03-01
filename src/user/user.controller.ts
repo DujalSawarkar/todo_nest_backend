@@ -31,7 +31,9 @@ export class UserController {
       // Do something with the token if needed
       console.log('JWT token:', token);
     }
-    return this.todo.create(CreateTodoDto, (req.user as UserEntity).id);
+
+    //@ts-ignore
+    return this.todo.create(CreateTodoDto, req.user.user.id);
   }
 
   @Get()
@@ -48,7 +50,9 @@ export class UserController {
       req.headers as { authorization?: string }
     )?.authorization?.replace('Bearer ', '');
 
-    const userId = (req.user as UserEntity).id;
+    //@ts-ignore
+    const userId = req.user.user.id;
+    console.log('User ID from todo', userId);
     return await this.todo.gettodosbyuser(userId);
   }
 

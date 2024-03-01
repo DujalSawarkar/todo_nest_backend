@@ -38,7 +38,7 @@ export class UserService {
   }
 
   async getallusers() {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({ where: { role: 'user' } });
     console.log('users', users);
     return users;
   }
@@ -48,7 +48,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    await this.userRepository.delete({ id: id });
+    await this.userRepository.remove(user);
     return user;
   }
 }

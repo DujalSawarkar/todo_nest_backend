@@ -1,12 +1,16 @@
 import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/role.guard';
+import { TodoService } from 'src/todo/todo.service';
 import { UserService } from 'src/user/user.service';
 
 @Controller('admin')
 @UseGuards(AuthGuard('jwt'), new RoleGuard('admin'))
 export class AdminController {
-  constructor(private readonly userservice: UserService) {}
+  constructor(
+    private readonly userservice: UserService,
+    private readonly todoservice: TodoService,
+  ) {}
 
   @Get('/:id')
   async getuserbyid(@Param('id') id: number) {
@@ -24,6 +28,7 @@ export class AdminController {
 
   @Delete('/:id')
   async deleteuser(@Param('id') id: number) {
+    await this.todoservice.deletetodosbyuser(id);
     const user = await this.userservice.deleteuser(id);
     console.log('usercontrollerdeleteuser', user);
     return user;
